@@ -32,22 +32,79 @@
         android:layout_height="wrap_content"
         onegravity:color_wheel_enabled="true" />
 
-    <com.onegravity.colorpicker.ValueBar
-        android:id="@+id/valuebar"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="5dp" />
+        android:orientation="horizontal"
+        >
 
-    <com.onegravity.colorpicker.SaturationBar
-        android:id="@+id/saturationbar"
+        <com.onegravity.colorpicker.ValueBar
+            android:id="@+id/valuebar"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            onegravity:bar_reference_textview="@id/valuebarText"
+            />
+
+        <TextView
+            android:id="@+id/valuebarText"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="100"
+            android:gravity="center_vertical|center"
+            />
+
+
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="5dp" />
+        android:orientation="horizontal"
+        >
 
-    <com.onegravity.colorpicker.OpacityBar
-        android:id="@+id/opacitybar"
+        <com.onegravity.colorpicker.SaturationBar
+            android:id="@+id/saturationbar"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            onegravity:bar_reference_textview="@id/saturationbarText"
+            />
+
+        <TextView
+            android:id="@+id/saturationbarText"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="100"
+            android:gravity="center_vertical|center"
+            />
+
+    </LinearLayout>
+
+
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp" />
+        android:orientation="horizontal"
+        >
+        <com.onegravity.colorpicker.OpacityBar
+            android:id="@+id/opacitybar"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            onegravity:bar_reference_textview="@id/opacitybarText"
+            />
 
+        <TextView
+            android:id="@+id/opacitybarText"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="100"
+            android:gravity="center_vertical|center"
+            />
+
+    </LinearLayout>
 </LinearLayout>

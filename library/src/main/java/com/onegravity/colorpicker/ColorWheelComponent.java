@@ -20,6 +20,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.LinearLayout;
 
 public class ColorWheelComponent {
 
@@ -60,6 +61,11 @@ public class ColorWheelComponent {
                 mColorPicker.addOpacityBar(opacityBar);
             }
             opacityBar.setVisibility(mUseOpacityBar ? View.VISIBLE : View.GONE);
+        }
+
+        LinearLayout opacitybarGroup = view.findViewById(R.id.opacitybarGroup);
+        if (opacitybarGroup != null) {
+            opacitybarGroup.setVisibility(mUseOpacityBar ? View.VISIBLE : View.GONE);
         }
 
         mColorPicker.setOldCenterColor(mInitialColor);

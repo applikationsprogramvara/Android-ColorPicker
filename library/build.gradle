@@ -17,17 +17,16 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion '26.0.1'
+    compileSdkVersion 27
 
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion 25
+        targetSdkVersion 27
     }
 
     buildTypes {
         release {
-            debuggable false
+            debuggable true
             minifyEnabled false
         }
     }
@@ -38,13 +37,13 @@ android {
 }
 
 dependencies {
-    def eventBusLibVersion = '3.0.0'
-    def supportLibVersion = '26.0.2'
 
-    compile "org.greenrobot:eventbus:${eventBusLibVersion}"
+
+
+    api "org.greenrobot:eventbus:3.0.0"
 
     // used for the material design (dialogs and tab layout)
-    compile "com.android.support:appcompat-v7:${supportLibVersion}"
+    api 'com.android.support:appcompat-v7:27.1.1'
 }
 
 apply from: '../android-artifacts.gradle'

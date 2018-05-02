@@ -31,6 +31,8 @@ import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 public class SaturationBar extends View {
 
@@ -153,6 +155,9 @@ public class SaturationBar extends View {
      * Saturation of the latest entry of the onSaturationChangedListener.
      */
     private int oldChangedListenerSaturation;
+    private int mTextViewId;
+    private TextView mTextView;
+
 
     public interface OnSaturationChangedListener {
         public void onSaturationChanged(int saturation);
@@ -200,6 +205,8 @@ public class SaturationBar extends View {
                 b.getDimensionPixelSize(R.dimen.bar_pointer_halo_radius));
         mOrientation = a.getBoolean(
                 R.styleable.ColorBars_bar_orientation_horizontal, ORIENTATION_DEFAULT);
+
+        mTextViewId = a.getResourceId(R.styleable.ColorBars_bar_reference_textview, 0);
 
         a.recycle();
 
@@ -255,6 +262,20 @@ public class SaturationBar extends View {
     }
 
     @Override
+    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+        super.onLayout(changed, left, top, right, bottom);
+
+        if ((mTextViewId != 0) && (mTextView == null)) {
+            LinearLayout parent = (LinearLayout) getParent();
+            if (parent != null) {
+                mTextView = parent.findViewById(mTextViewId);
+                mTextView.setText(Integer.toString((int) (100 * posToColor(mBarPointerPosition)))); // set text is called earlier
+            }
+        }
+
+    }
+
+    @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
 
@@ -272,8 +293,8 @@ public class SaturationBar extends View {
             x1 = mBarThickness;
             y1 = (mBarLength + mBarPointerHaloRadius);
             mBarLength = h - (mBarPointerHaloRadius * 2);
-            mBarRect.set(mBarPointerHaloRadius,
-                    (mBarPointerHaloRadius - (mBarThickness / 2)),
+            mBarRect.set((mBarPointerHaloRadius - (mBarThickness / 2)),
+                    mBarPointerHaloRadius,
                     (mBarPointerHaloRadius + (mBarThickness / 2)),
                     (mBarLength + (mBarPointerHaloRadius)));
         }
@@ -391,6 +412,10 @@ public class SaturationBar extends View {
                         invalidate();
                     }
                 }
+                if (mTextView != null) {
+                    mTextView.setText(Integer.toString((int) (100 * posToColor(mBarPointerPosition))));
+                }
+
                 if (onSaturationChangedListener != null && oldChangedListenerSaturation != mColor) {
                     onSaturationChangedListener.onSaturationChanged(mColor);
                     oldChangedListenerSaturation = mColor;
@@ -477,6 +502,18 @@ public class SaturationBar extends View {
                 (float) ((mPosToSatFactor * coord)),
                 1f});
     }
+
+
+    private float posToColor(int coord) {
+        coord = coord - mBarPointerHaloRadius;
+        if (coord < 0) {
+            coord = 0;
+        } else if (coord > mBarLength) {
+            coord = mBarLength;
+        }
+        return (float) (mPosToSatFactor * coord); // 0 - no saturation, 1 - full saturation
+    }
+
 
     /**
      * Get the currently selected color.

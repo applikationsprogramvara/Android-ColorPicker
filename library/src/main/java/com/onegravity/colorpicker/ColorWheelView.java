@@ -613,14 +613,18 @@ public class ColorWheelView extends View {
             case MotionEvent.ACTION_DOWN:
                 // Check whether the user pressed on the pointer.
                 float[] pointerPosition = calculatePointerPosition(mAngle);
-                if (x >= (pointerPosition[0] - mColorPointerHaloRadius)
+                if ( x >= (pointerPosition[0] - mColorPointerHaloRadius)
                         && x <= (pointerPosition[0] + mColorPointerHaloRadius)
                         && y >= (pointerPosition[1] - mColorPointerHaloRadius)
-                        && y <= (pointerPosition[1] + mColorPointerHaloRadius)) {
+                        && y <= (pointerPosition[1] + mColorPointerHaloRadius) ) {
                     mSlopX = x - pointerPosition[0];
                     mSlopY = y - pointerPosition[1];
                     mUserIsMovingPointer = true;
                     invalidate();
+                } else if (Math.abs(Math.hypot(x, y) - Math.hypot(pointerPosition[0], pointerPosition[1])) < mColorPointerHaloRadius) { // click any place of the wheel
+                    mSlopX = 0;
+                    mSlopY = 0;
+                    mUserIsMovingPointer = true;
                 }
                 // Check whether the user pressed on the center.
                 else if (x >= -mColorCenterRadius && x <= mColorCenterRadius

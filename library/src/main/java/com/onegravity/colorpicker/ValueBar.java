@@ -31,6 +31,8 @@ import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 public class ValueBar extends View {
 
@@ -153,6 +155,8 @@ public class ValueBar extends View {
      * Value of the latest entry of the onValueChangedListener.
      */
     private int oldChangedListenerValue;
+    private int mTextViewId;
+    private TextView mTextView;
 
     public interface OnValueChangedListener {
         public void onValueChanged(int value);
@@ -200,6 +204,8 @@ public class ValueBar extends View {
                 b.getDimensionPixelSize(R.dimen.bar_pointer_halo_radius));
         mOrientation = a.getBoolean(
                 R.styleable.ColorBars_bar_orientation_horizontal, ORIENTATION_DEFAULT);
+
+        mTextViewId = a.getResourceId(R.styleable.ColorBars_bar_reference_textview, 0);
 
         a.recycle();
 
@@ -255,6 +261,19 @@ public class ValueBar extends View {
     }
 
     @Override
+    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+        super.onLayout(changed, left, top, right, bottom);
+
+        if ((mTextViewId != 0) && (mTextView == null)) {
+            LinearLayout parent = (LinearLayout) getParent();
+            if (parent != null) {
+                mTextView = parent.findViewById(mTextViewId);
+                mTextView.setText(Integer.toString((int) (100 * posToColor(mBarPointerPosition)))); // set text is called earlier
+            }
+        }
+    }
+
+    @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
 
@@ -272,8 +291,8 @@ public class ValueBar extends View {
             x1 = mBarThickness;
             y1 = (mBarLength + mBarPointerHaloRadius);
             mBarLength = h - (mBarPointerHaloRadius * 2);
-            mBarRect.set(mBarPointerHaloRadius,
-                    (mBarPointerHaloRadius - (mBarThickness / 2)),
+            mBarRect.set((mBarPointerHaloRadius - (mBarThickness / 2)),
+                    mBarPointerHaloRadius,
                     (mBarPointerHaloRadius + (mBarThickness / 2)),
                     (mBarLength + (mBarPointerHaloRadius)));
         }
@@ -389,6 +408,11 @@ public class ValueBar extends View {
                         invalidate();
                     }
                 }
+
+                if (mTextView != null) {
+                    mTextView.setText(Integer.toString((int) (100 * posToColor(mBarPointerPosition))));
+                }
+
                 if (onValueChangedListener != null && oldChangedListenerValue != mColor) {
                     onValueChangedListener.onValueChanged(mColor);
                     oldChangedListenerValue = mColor;
@@ -471,6 +495,19 @@ public class ValueBar extends View {
                 mHSVColor[1],
                 (float) (1 - (mPosToSatFactor * coord))});
     }
+
+
+    private float posToColor(int coord) {
+        coord = coord - mBarPointerHaloRadius;
+        if (coord < 0) {
+            coord = 0;
+        } else if (coord > mBarLength) {
+            coord = mBarLength;
+        }
+        return (float) (mPosToSatFactor * coord); // 0 - white, 1 - black
+    }
+
+
 
     /**
      * Get the currently selected color.

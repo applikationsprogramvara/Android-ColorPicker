@@ -31,6 +31,8 @@ import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 public class OpacityBar extends View {
 
@@ -143,6 +145,8 @@ public class OpacityBar extends View {
      * Opacity of the latest entry of the onOpacityChangedListener.
      */
     private int oldChangedListenerOpacity;
+    private int mTextViewId;
+    private TextView mTextView;
 
     public interface OnOpacityChangedListener {
         public void onOpacityChanged(int opacity);
@@ -201,6 +205,8 @@ public class OpacityBar extends View {
         mOrientation = a.getBoolean(
                 R.styleable.ColorBars_bar_orientation_horizontal, ORIENTATION_DEFAULT);
 
+        mTextViewId = a.getResourceId(R.styleable.ColorBars_bar_reference_textview, 0);
+
         a.recycle();
 
         mBarPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -255,6 +261,19 @@ public class OpacityBar extends View {
     }
 
     @Override
+    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+        super.onLayout(changed, left, top, right, bottom);
+
+        if ((mTextViewId != 0) && (mTextView == null)) {
+            LinearLayout parent = (LinearLayout) getParent();
+            if (parent != null) {
+                mTextView = parent.findViewById(mTextViewId);
+                mTextView.setText(Integer.toString((int) (100 * posToColor(mBarPointerPosition)))); // set text is called earlier
+            }
+        }
+    }
+
+    @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
 
@@ -272,8 +291,8 @@ public class OpacityBar extends View {
             x1 = mBarThickness;
             y1 = (mBarLength + mBarPointerHaloRadius);
             mBarLength = h - (mBarPointerHaloRadius * 2);
-            mBarRect.set(mBarPointerHaloRadius,
-                    (mBarPointerHaloRadius - (mBarThickness / 2)),
+            mBarRect.set((mBarPointerHaloRadius - (mBarThickness / 2)),
+                    mBarPointerHaloRadius,
                     (mBarPointerHaloRadius + (mBarThickness / 2)),
                     (mBarLength + (mBarPointerHaloRadius)));
         }
@@ -385,6 +404,10 @@ public class OpacityBar extends View {
                         invalidate();
                     }
                 }
+                if (mTextView != null) {
+                    mTextView.setText(Integer.toString((int) (100 * posToColor(mBarPointerPosition))));
+                }
+
                 if (onOpacityChangedListener != null && oldChangedListenerOpacity != getOpacity()) {
                     onOpacityChangedListener.onOpacityChanged(getOpacity());
                     oldChangedListenerOpacity = getOpacity();
@@ -434,7 +457,7 @@ public class OpacityBar extends View {
     /**
      * Set the pointer on the bar. With the opacity value.
      *
-     * @param saturation float between 0 > 255
+     * @param opacity float between 0 > 255
      */
     public void setOpacity(int opacity) {
         mBarPointerPosition = Math.round((mOpacToPosFactor * opacity)) + mBarPointerHaloRadius;
@@ -484,6 +507,18 @@ public class OpacityBar extends View {
             mColor = Color.TRANSPARENT;
         }
     }
+
+    private float posToColor(int coord) {
+        coord = coord - mBarPointerHaloRadius;
+        if (coord < 0) {
+            coord = 0;
+        } else if (coord > mBarLength) {
+            coord = mBarLength;
+        }
+        return (float) (mPosToOpacFactor * coord / 255);
+    }
+
+
 
     /**
      * Get the currently selected color.

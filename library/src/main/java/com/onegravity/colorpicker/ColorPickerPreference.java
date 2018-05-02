@@ -17,6 +17,7 @@
 package com.onegravity.colorpicker;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -65,11 +66,7 @@ public class ColorPickerPreference extends Preference implements
             mAlphaSliderEnabled = attrs.getAttributeBooleanValue(null, "alphaSlider", false);
             String defaultValue = attrs.getAttributeValue(androidns, "defaultValue");
             if (defaultValue != null && defaultValue.startsWith("#")) {
-                try {
-                    mDefaultValue = Util.convertToColorInt(defaultValue, mAlphaSliderEnabled);
-                } catch (NumberFormatException e) {
-                    mDefaultValue = Util.convertToColorInt("#FF000000", mAlphaSliderEnabled);
-                }
+                mDefaultValue = defaultValueHelper(defaultValue);
             } else {
                 int resourceId = attrs.getAttributeResourceValue(androidns, "defaultValue", 0);
                 if (resourceId != 0) {
@@ -78,6 +75,14 @@ public class ColorPickerPreference extends Preference implements
             }
         }
         mCurrentValue = mDefaultValue;
+    }
+
+    private int defaultValueHelper(String defaultValue) {
+        try {
+            return Util.convertToColorInt(defaultValue, mAlphaSliderEnabled);
+        } catch (NumberFormatException e) {
+            return Util.convertToColorInt("#FF000000", mAlphaSliderEnabled);
+        }
     }
 
     @Override
@@ -163,4 +168,20 @@ public class ColorPickerPreference extends Preference implements
         return false;
     }
 
+    @Override
+    protected void onSetInitialValue(boolean restorePersistedValue, Object defaultValue) {
+        if (restorePersistedValue) {
+            // Restore existing state
+            mCurrentValue = this.getPersistedInt(mDefaultValue);
+        } else {
+            // Set default state from the XML attribute
+            mCurrentValue = (Integer) defaultValue;
+            persistInt(mCurrentValue);
+        }
+    }
+
+    @Override
+    protected Object onGetDefaultValue(TypedArray a, int index) {
+        return (Integer) defaultValueHelper(a.getString(index));
+    }
 }
