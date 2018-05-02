@@ -1,5 +1,14 @@
 # Android-ColorPicker
 
+01.05.18 Changes
+-----
+1. Correct initialization of the default values
+2. Click any place of the wheel
+3. Widening the stripes
+4. Adding texts with values for bars
+5. Small bug fixes
+
+
 [![License](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 
 The Android Color Picker is a beautifully designed component based on Lars Werkman's color picker: https://github.com/LarsWerkman/HoloColorPicker.
